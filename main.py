@@ -20,12 +20,27 @@ MIC_POSITIONS = np.array([
     [1.5, 1.0],
 ])
 
-TEST_SCENARIOS = [
-    {"label": "Speech  @  45 deg", "source": ( 3.0,  5.0), "sound": "speech"},
-    {"label": "Clap    @  90 deg", "source": ( 1.0,  2.0), "sound": "clap"},
-    {"label": "Noise   @ 180 deg", "source": (-2.0,  0.0), "sound": "noise"},
-    {"label": "Whistle @ 315 deg", "source": ( 4.0, -5.0), "sound": "whistle"},
+# Scenarios are defined by (name, true bearing in degrees, distance in
+# metres, sound type). Source coordinates are DERIVED from the angle so the
+# label always matches reality -- previously the source (x,y) values were
+# hand-picked and didn't actually correspond to the angles in their labels.
+SCENARIO_DEFS = [
+    ("Speech",  45,  3.0, "speech"),
+    ("Clap",    90,  2.5, "clap"),
+    ("Noise",  180,  2.0, "noise"),
+    ("Whistle", 315, 4.0, "whistle"),
 ]
+
+TEST_SCENARIOS = []
+for _name, _angle_deg, _dist, _sound in SCENARIO_DEFS:
+    _rad  = np.radians(_angle_deg)
+    _src_x = round(_dist * np.cos(_rad), 3)
+    _src_y = round(_dist * np.sin(_rad), 3)
+    TEST_SCENARIOS.append({
+        "label":  f"{_name}  @  {_angle_deg} deg",
+        "source": (_src_x, _src_y),
+        "sound":  _sound,
+    })
 
 def angle_from_position(x, y):
     return np.degrees(np.arctan2(y, x)) % 360
